@@ -68,7 +68,7 @@ def get_flipkart_price(product):
     else:
         return "Price not found on Flipkart"
 
-@app.route('/api/prices', methods=['GET'])
+@app.route('/prices', methods=['GET'])
 def get_prices():
     product = request.args.get('product')
     if not product:
@@ -86,6 +86,3 @@ def get_prices():
     response = jsonify(prices)
     response.headers.add('Access-Control-Allow-Origin', '*')  # Allow all origins
     return response
-
-if __name__ == '__main__':
-    app.run(debug=True)
