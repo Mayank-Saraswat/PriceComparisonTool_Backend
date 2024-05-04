@@ -68,6 +68,10 @@ def get_flipkart_price(product):
     else:
         return "Price not found on Flipkart"
 
+@app.route('/', methods=['POST', 'GET'])
+def start():
+    return "Tool server is Running"
+
 @app.route('/prices', methods=['GET'])
 def get_prices():
     product = request.args.get('product')
