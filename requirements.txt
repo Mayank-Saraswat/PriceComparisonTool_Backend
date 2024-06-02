@@ -4,3 +4,4 @@ Flask-Cors==4.0.0
 Requests==2.31.0
 Fake-useragent==1.5.1
 Beautifulsoup4==4.12.3
+Mysql-connector-python==8.4.0

@@ -3,9 +3,20 @@ from flask_cors import CORS
 import requests
 import fake_useragent
 from bs4 import BeautifulSoup
+import mysql.connector
 
 app = Flask(__name__)
 CORS(app)
+
+# Database connection
+def get_db_connection():
+    return mysql.connector.connect(
+        host='localhost',
+        port="3306",
+        user='root',
+        password='2001',
+        database='pricecomparisondb'
+    )
 
 def extract_flipkart_image(product):
     try:
@@ -71,6 +82,48 @@ def get_flipkart_price(product):
 @app.route('/', methods=['POST', 'GET'])
 def start():
     return "Tool server is Running"
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM login_credentials WHERE Email = %s AND Pass = %s', (email, password))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if user:
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        return jsonify({"error": "Invalid credentials"}), 401
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check for duplicate email
+    cursor.execute('SELECT * FROM login_credentials WHERE Email = %s', (email,))
+    user = cursor.fetchone()
+    if user:
+        cursor.close()
+        conn.close()
+        return jsonify({"error": "Email already exists"}), 409  # 409 Conflict
+
+    cursor.execute('INSERT INTO login_credentials (Email, Pass) VALUES (%s, %s)', (email, password))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({"message": "Signup successful"}), 201
 
 @app.route('/prices', methods=['GET'])
 def get_prices():
