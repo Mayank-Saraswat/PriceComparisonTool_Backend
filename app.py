@@ -4,6 +4,7 @@ import requests
 import fake_useragent
 from bs4 import BeautifulSoup
 import mysql.connector
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -11,11 +12,11 @@ CORS(app)
 # Database connection
 def get_db_connection():
     return mysql.connector.connect(
-        host='localhost',
-        port="3306",
-        user='root',
-        password='2001',
-        database='pricecomparisondb'
+        host=os.getenv("DB_HOST"),
+        port=int(os.getenv("DB_PORT")),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")
     )
 
 def extract_flipkart_image(product):
