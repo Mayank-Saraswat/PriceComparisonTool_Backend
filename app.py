@@ -1,13 +1,16 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
-import fake_useragent
 from bs4 import BeautifulSoup
 import mysql.connector
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(
+    app,
+    resources={r"/*": {"origins": "https://price-comparison-tool-frontend-kohl.vercel.app"}},
+    supports_credentials=True
+)
 
 # Database connection
 def get_db_connection():
@@ -36,7 +39,7 @@ def extract_flipkart_image(product):
         }
 
         # Send GET request to Amazon search URL
-        response = requests.get(search_url, headers=headers)
+        response = requests.get(search_url, headers=headers, timeout=8)
         response.raise_for_status()
 
         # Parse HTML content
@@ -57,9 +60,9 @@ def extract_flipkart_image(product):
 def get_amazon_price(product):
     url = f'https://www.amazon.in/s?k={product.replace(" ", "+")}'
     headers = {
-        'User-Agent': fake_useragent.UserAgent().random,
+        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
     }
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=8)
     soup = BeautifulSoup(response.content, 'html.parser')
     price_tag = soup.find('span', {'class': 'a-price-whole'})
     if price_tag:
@@ -70,9 +73,9 @@ def get_amazon_price(product):
 def get_flipkart_price(product):
     url = f'https://www.flipkart.com/search?q={product.replace(" ", "%20")}'
     headers = {
-        'User-Agent': 'Your User Agent Here',
+        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
     }
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=8)
     soup = BeautifulSoup(response.content, 'html.parser')
     price_tag = soup.find('div', {'class': 'Nx9bqj'})
     if price_tag:
