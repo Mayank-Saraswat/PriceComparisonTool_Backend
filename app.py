@@ -140,9 +140,9 @@ def get_prices():
     flipkart_image_url = extract_flipkart_image(product)
 
     prices = {
-        "Amazon": "100",
-        "Flipkart": "90",
-        "Flipkart_Image_URL": ""
+        'Amazon': amazon_price,
+        'Flipkart': flipkart_price,
+        'Flipkart_Image_URL': flipkart_image_url
     }
     response = jsonify(prices)
     response.headers.add('Access-Control-Allow-Origin', '*')  # Allow all origins
